@@ -21,6 +21,12 @@ component 'curl' do |pkg, settings, platform|
   pkg.build_requires "openssl-#{settings[:openssl_version]}"
   pkg.build_requires "puppet-ca-bundle"
 
+  if platform.name =~ /^el-\d*-.*$/
+    gssapi='--with-gssapi'
+  else
+    gssapi='--without-gssapi'
+  end
+
   ldflags = settings[:ldflags]
   if platform.is_cross_compiled_linux?
     pkg.build_requires "runtime-#{settings[:runtime_project]}"
@@ -88,6 +94,7 @@ component 'curl' do |pkg, settings, platform|
         --with-ca-bundle=#{settings[:prefix]}/ssl/cert.pem \
         --with-ca-path=#{settings[:prefix]}/ssl/certs \
         --without-nghttp2 \
+        #{gssapi} \
         CFLAGS='#{settings[:cflags]}' \
         #{settings[:host]}"]
   end
